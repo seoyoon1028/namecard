@@ -136,8 +136,13 @@
       background: rgba(0,0,0,.68); -webkit-backdrop-filter: blur(6px); backdrop-filter: blur(6px);
       transition-delay: 0s;
     }
+    .modal-backdrop { padding: 10px; overflow-y: auto; overscroll-behavior: contain; }
     .empty-modal {
-      position: relative; width: min(300px, 72vw, 68vh); aspect-ratio: 1 / 1;
+      position: relative; box-sizing: border-box;
+      width: min(600px, calc(100vw - 20px), calc((100dvh - 20px) * 4 / 3));
+      aspect-ratio: 4 / 3; max-height: calc(100dvh - 20px);
+      display: flex; flex-direction: column; gap: clamp(10px, 2vw, 17px);
+      padding: clamp(17px, 3.2vw, 29px); overflow-y: auto; scrollbar-gutter: stable;
       background: linear-gradient(145deg, rgba(31,30,36,.99), rgba(15,15,20,.99));
       border: 1px solid #F26B3A; border-radius: 5px;
       box-shadow: 0 0 0 1px rgba(242,107,58,.2), 0 0 28px rgba(242,107,58,.25), inset 0 0 24px rgba(242,107,58,.045);
@@ -148,6 +153,47 @@
     .empty-modal::before, .empty-modal::after { content: ""; position: absolute; width: 13px; height: 13px; border-color: #ff925d; pointer-events: none; }
     .empty-modal::before { top: -1px; left: -1px; border-top: 2px solid; border-left: 2px solid; }
     .empty-modal::after { right: -1px; bottom: -1px; border-right: 2px solid; border-bottom: 2px solid; }
+    .quest-modal-status {
+      align-self: flex-start; margin: 0; padding: 7px 11px;
+      color: #ffad83; border: 1px solid rgba(242,107,58,.55); border-left: 3px solid #F26B3A;
+      background: rgba(242,107,58,.09); font-family: var(--pixel); font-size: clamp(10px, 1.6vw, 12px);
+      line-height: 1.6; letter-spacing: .04em;
+    }
+    .quest-modal-title {
+      margin: 0; color: #fff1e9; font-family: var(--pixel); font-size: clamp(18px, 3vw, 25px);
+      line-height: 1.55; overflow-wrap: anywhere; word-break: keep-all;
+      text-shadow: 0 0 16px rgba(242,107,58,.2);
+    }
+    .quest-modal-intro {
+      margin: 0; color: #c9bfba; font-family: "Malgun Gothic", sans-serif;
+      font-size: clamp(12px, 1.75vw, 14px); line-height: 1.85; overflow-wrap: anywhere; word-break: keep-all;
+    }
+    .quest-reward-box {
+      position: relative; margin-top: auto; min-height: 112px; flex: 0 0 auto;
+      display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 14px;
+      padding: 17px 15px; border: 1px solid rgba(242,107,58,.58); border-radius: 4px;
+      background: linear-gradient(135deg, rgba(242,107,58,.09), rgba(255,255,255,.018));
+      box-shadow: inset 0 0 22px rgba(242,107,58,.045), 0 0 15px rgba(242,107,58,.07);
+    }
+    .quest-reward-heading {
+      align-self: flex-start; margin: 0; color: #ffad83; font-family: var(--pixel);
+      font-size: clamp(10px, 1.55vw, 12px); line-height: 1.6;
+    }
+    .quest-reward-button {
+      display: inline-flex; min-width: 132px; min-height: 42px; align-items: center; justify-content: center;
+      padding: 0 18px; border: 1px solid #ffae83; border-radius: 3px;
+      color: #1d1513; background: linear-gradient(135deg, #ffab7e, #f26b3a);
+      box-shadow: 0 0 18px rgba(242,107,58,.23), inset 0 1px rgba(255,255,255,.5);
+      font-family: var(--pixel); font-size: 11px; font-weight: 900; text-decoration: none;
+      transition: transform .18s ease, box-shadow .18s ease, filter .18s ease;
+    }
+    .quest-reward-button:hover { transform: translateY(-2px); filter: brightness(1.08); box-shadow: 0 0 25px rgba(242,107,58,.42); }
+    .quest-reward-button:active { transform: translateY(0) scale(.98); }
+    .quest-reward-button:focus-visible { outline: 3px solid #fff0df; outline-offset: 4px; }
+    .quest-reward-pending {
+      margin: 0; color: #d9cfca; font-family: "Malgun Gothic", sans-serif;
+      font-size: clamp(12px, 1.8vw, 14px); line-height: 1.7; text-align: center; overflow-wrap: anywhere;
+    }
     body.modal-open { overflow: hidden; }
 
     .guild-panel { display: flex; align-items: center; justify-content: center; gap: 18px; margin-top: 14px; padding: 16px 19px; }
@@ -245,7 +291,7 @@
   </main>
 
   <div class="modal-backdrop" id="quest-modal" aria-hidden="true">
-    <div class="empty-modal" id="empty-modal" role="dialog" aria-modal="true" aria-label="빈 창" tabindex="-1"></div>
+    <section class="empty-modal" id="empty-modal" role="dialog" aria-modal="true" aria-labelledby="quest-modal-heading" tabindex="-1"></section>
   </div>
 
   <script>
@@ -268,17 +314,40 @@
         {
           title: "테라리아 가이드",
           description: "테라리아를 클리어하기 위한 여러가지 공략을 정리",
-          period: "2026"
+          period: "2026",
+          modal: {
+            status: "메인 퀘스트 완료!",
+            heading: "테라리아 비공식 가이드 사이트",
+            intro: "테라리아를 처음 입문하는 사람도, 테라리아를 해본 사람도 찾아볼 수 있는 만능 공략집! (@@게임도 있어요@@)",
+            rewardTitle: "퀘스트 보상 받기",
+            rewardButton: "보상 받기",
+            rewardUrl: "https://sites.google.com/view/terraria-unofficial-guide/"
+          }
         },
         {
           title: "팬게임 [ Sol's Dice ]",
           description: "로블록스 게임 'Sol's RNG'를 모티브, 로블록스 스튜디오로 개발중",
-          period: "2025~"
+          period: "2025~",
+          modal: {
+            status: "메인 퀘스트 미완료",
+            heading: "Sol's RNG의 팬게임, [ Sol's Dice ]",
+            intro: "로블록스의 게임, Sol's RNG를 RPG 형식으로 구현한 게임입니다!",
+            rewardTitle: "퀘스트 보상 받기",
+            pendingMessage: "아직 퀘스트를 클리어하지 않으셨습니다."
+          }
         },
         {
           title: "팬게임 [ Terraria RNG ]",
           description: "Re Rogic의 명작 'Terraria'를 모티브, 웹앱으로 개발 완료",
-          period: "2026"
+          period: "2026",
+          modal: {
+            status: "히든 퀘스트 완료!",
+            heading: "Terraria의 팬게임, [ Terraria RNG ]",
+            intro: "테라리아를 RNG 형식의 시뮬레이터로 즐겨보세요! 뽑기를 통해 다양한 아이템을 얻고 보스를 잡아 강력해지는 게임입니다",
+            rewardTitle: "퀘스트 보상 받기",
+            rewardButton: "보상 받기",
+            rewardUrl: "https://script.google.com/macros/s/AKfycbyMezvn-cb-B1z5RUsdV_LbTlLK8yvdc60d69j9nJ09m0jgx8aw2xkCnq4M_Oa8XbWspA/exec"
+          }
         }
       ],
       labels: {
@@ -337,7 +406,7 @@
 
       $("skill-tree").innerHTML = PROFILE.tools.map(tool => `<button type="button" class="skill-node" aria-pressed="false">${escapeHtml(tool)}</button>`).join("");
       $("quests-list").innerHTML = PROFILE.quests.map((quest, index) => `
-        <button type="button" class="quest" aria-label="${escapeHtml(quest.title)} 빈 창 열기">
+        <button type="button" class="quest" data-quest-index="${index}" aria-label="${escapeHtml(quest.title)} 상세 창 열기">
           <span class="quest-index">${String(index + 1).padStart(2, "0")}</span>
           <span class="quest-main">
             <span class="quest-title-line"><span class="quest-title">${escapeHtml(quest.title)}</span><span class="quest-period">${escapeHtml(quest.period)}</span></span>
@@ -406,8 +475,31 @@
         if (lastQuestButton && document.contains(lastQuestButton)) lastQuestButton.focus();
       };
 
+      const renderQuestModal = (quest) => {
+        const data = quest.modal;
+        const rewardContent = data.rewardUrl && data.rewardButton
+          ? `<a class="quest-reward-button" href="${escapeHtml(data.rewardUrl)}" target="_blank" rel="noopener noreferrer">${escapeHtml(data.rewardButton)}</a>`
+          : `<p class="quest-reward-pending">${escapeHtml(data.pendingMessage || "")}</p>`;
+
+        modalContent.innerHTML = `
+          <p class="quest-modal-status">${escapeHtml(data.status)}</p>
+          <h2 class="quest-modal-title" id="quest-modal-heading">${escapeHtml(data.heading)}</h2>
+          <p class="quest-modal-intro">${escapeHtml(data.intro)}</p>
+          <div class="quest-reward-box">
+            <h3 class="quest-reward-heading">${escapeHtml(data.rewardTitle)}</h3>
+            ${rewardContent}
+          </div>
+        `;
+        modalContent.setAttribute("aria-label", data.heading);
+      };
+
       const openQuestModal = (button) => {
+        const questIndex = Number(button.dataset.questIndex);
+        const quest = PROFILE.quests[questIndex];
+        if (!quest || !quest.modal) return;
         lastQuestButton = button;
+        renderQuestModal(quest);
+        modalContent.scrollTop = 0;
         modal.classList.add("is-open");
         modal.setAttribute("aria-hidden", "false");
         document.body.classList.add("modal-open");
